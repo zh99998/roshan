@@ -1,6 +1,5 @@
 # Matter aliases
 Engine = Matter.Engine
-Gui = Matter.Gui
 World = Matter.World
 Bodies = Matter.Bodies
 Body = Matter.Body
@@ -8,34 +7,41 @@ Composite = Matter.Composite
 Composites = Matter.Composites
 Common = Matter.Common
 Constraint = Matter.Constraint
+RenderPixi = Matter.RenderPixi
+Events = Matter.Events
+Bounds = Matter.Bounds
+Vector = Matter.Vector
+Vertices = Matter.Vertices
 MouseConstraint = Matter.MouseConstraint
+Mouse = Matter.Mouse
+Query = Matter.Query
+
 Game = {}
 _engine = undefined
 _sceneName = "mixed"
 _sceneWidth = undefined
 _sceneHeight = undefined
+_sceneEvents = []
 Game.init = ->
   canvasContainer = document.getElementById("canvas-container")
-  demoStart = document.getElementById("start")
-  demoStart.addEventListener "click", ->
-    demoStart.style.display = "none"
-    _engine = Engine.create(canvasContainer,
-#      render:
-#        options:
-#          wireframes: true
-#          showAngleIndicator: true
-#          showDebug: true
-    )
+  GameStart = document.getElementById("start")
+  GameStart.addEventListener "click", ->
+    GameStart.style.display = "none"
+    _engine = Engine.create canvasContainer,
+      render:
+        options:
+          wireframes: false
+          showAngleIndicator: true
+          showDebug: true
+
     Game.fullscreen()
-    setTimeout (->
+    setTimeout ->
       Engine.run _engine
       Game.updateScene()
-      return
-    ), 800
+    , 800
 
-#  window.addEventListener "deviceorientation", Game.updateGravity, true
-  window.addEventListener "touchstart", Game.fullscreen
-  window.addEventListener "touchstart", Game.action
+    new FastButton window, Game.action
+      #  window.addEventListener "deviceorientation", Game.updateGravity, true
 #  window.addEventListener "orientationchange", (->
 #    Game.updateGravity()
 #    Game.updateScene()
@@ -43,20 +49,29 @@ Game.init = ->
 #    return
 #  ), false
 
-window.addEventListener "load", Game.init
 Game.mixed = ->
   Game.reset()
+  roshan = Bodies.rectangle 0, _sceneHeight - 50, 200, 100,
+    friction: 0.01
+    restitution: 0.4
+  _sceneEvents.push Events.on _engine, "tick", (event)->
+    roshan.position.x = _sceneWidth / 2 + 100 * Math.sin(_engine.timing.timestamp * 0.001)
+    Body.applyGravityAll([roshan], { x: 0, y: -1 })
+
+  World.add _engine.world, roshan
+
 
 Game.action = ->
-  World.add _engine.world, Composites.stack 0, 0, 1, 1, 0, 0, (x, y, column, row) ->
-    Bodies.rectangle _sceneWidth * 0.5 - 20, 0, 40, 40,
-      friction: 0.01
-      restitution: 0.4
+  World.add _engine.world, Bodies.rectangle _sceneWidth * 0.5, 0, 40, 40,
+    friction: 0.01
+    restitution: 0.4
+    #render:
+
 
 Game.updateScene = ->
   return  unless _engine
-  _sceneWidth = document.documentElement.clientWidth
-  _sceneHeight = document.documentElement.clientHeight
+  _sceneWidth = 500 #document.documentElement.clientWidth
+  _sceneHeight = 500 #document.documentElement.clientHeight
   boundsMax = _engine.world.bounds.max
   renderOptions = _engine.render.options
   canvas = _engine.render.canvas
@@ -83,29 +98,31 @@ Game.updateGravity = ->
     gravity.x = Common.clamp(-event.beta, -90, 90) / 90
     gravity.y = Common.clamp(event.gamma, -90, 90) / 90
 Game.fullscreen = ->
-  _fullscreenElement = _engine.render.canvas
-  if not document.fullscreenElement and not document.mozFullScreenElement and not document.webkitFullscreenElement
-    if _fullscreenElement.requestFullscreen
-      _fullscreenElement.requestFullscreen()
-    else if _fullscreenElement.mozRequestFullScreen
-      _fullscreenElement.mozRequestFullScreen()
-    else _fullscreenElement.webkitRequestFullscreen Element.ALLOW_KEYBOARD_INPUT  if _fullscreenElement.webkitRequestFullscreen
+#  _fullscreenElement = _engine.render.canvas
+#  if not document.fullscreenElement and not document.mozFullScreenElement and not document.webkitFullscreenElement
+#    if _fullscreenElement.requestFullscreen
+#      _fullscreenElement.requestFullscreen()
+#    else if _fullscreenElement.mozRequestFullScreen
+#      _fullscreenElement.mozRequestFullScreen()
+#    else _fullscreenElement.webkitRequestFullscreen Element.ALLOW_KEYBOARD_INPUT  if _fullscreenElement.webkitRequestFullscreen
 
 Game.reset = ->
   _world = _engine.world
   Common._seed = 2
   World.clear _world
   Engine.clear _engine
-  offset = 5
-  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, -offset, _sceneWidth + 0.5, 50.5,
-    isStatic: true
-  )
-  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, _sceneHeight + offset, _sceneWidth + 0.5, 50.5,
-    isStatic: true
-  )
-  World.addBody _world, Bodies.rectangle(_sceneWidth + offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
-    isStatic: true
-  )
-  World.addBody _world, Bodies.rectangle(-offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
-    isStatic: true
-  )
+#  offset = 5
+#  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, -offset, _sceneWidth + 0.5, 50.5,
+#    isStatic: true
+#  )
+#  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, _sceneHeight + offset, _sceneWidth + 0.5, 50.5,
+#    isStatic: true
+#  )
+#  World.addBody _world, Bodies.rectangle(_sceneWidth + offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
+#    isStatic: true
+#  )
+#  World.addBody _world, Bodies.rectangle(-offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
+#    isStatic: true
+#  )
+
+Game.init()
