@@ -74,22 +74,35 @@
   };
 
   Game.mixed = function() {
-    var roshan;
+    var bottom, roshan;
     Game.reset();
-    roshan = Bodies.rectangle(0, _sceneHeight - 50, 200, 100, {
+    roshan = Bodies.rectangle(100, _sceneHeight - 50, 200, 100, {
       friction: 0.01,
       restitution: 0.4
     });
+    bottom = Bodies.rectangle(100, _sceneHeight, 200, 1, {
+      isStatic: true
+    });
     _sceneEvents.push(Events.on(_engine, "tick", function(event) {
-      return roshan.position.x = _sceneWidth / 2 + 100 * Math.sin(_engine.timing.timestamp * 0.001);
+      roshan.position.x = _sceneWidth / 2 + 100 * Math.sin(_engine.timing.timestamp * 0.001);
+      return Body.translate(bottom, {
+        x: roshan.position.x - bottom.position.x,
+        y: 0
+      });
     }));
-    return World.add(_engine.world, roshan);
+    World.add(_engine.world, roshan);
+    return World.add(_engine.world, bottom);
   };
 
   Game.action = function() {
-    return World.add(_engine.world, Bodies.rectangle(_sceneWidth * 0.5, 0, 40, 40, {
+    return World.add(_engine.world, Bodies.rectangle(_sceneWidth * 0.5, 0, 61, 52, {
       friction: 0.01,
-      restitution: 0.4
+      restitution: 0.4,
+      render: {
+        sprite: {
+          texture: './img/block/0.png'
+        }
+      }
     }));
   };
 
@@ -154,24 +167,11 @@
   };
 
   Game.reset = function() {
-    var offset, _world;
+    var _world;
     _world = _engine.world;
     Common._seed = 2;
     World.clear(_world);
-    Engine.clear(_engine);
-    offset = 5;
-    World.addBody(_world, Bodies.rectangle(_sceneWidth * 0.5, -offset, _sceneWidth + 0.5, 50.5, {
-      isStatic: true
-    }));
-    World.addBody(_world, Bodies.rectangle(_sceneWidth * 0.5, _sceneHeight + offset, _sceneWidth + 0.5, 50.5, {
-      isStatic: true
-    }));
-    World.addBody(_world, Bodies.rectangle(_sceneWidth + offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5, {
-      isStatic: true
-    }));
-    return World.addBody(_world, Bodies.rectangle(-offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5, {
-      isStatic: true
-    }));
+    return Engine.clear(_engine);
   };
 
   Game.init();

@@ -54,21 +54,43 @@ Game.init = ->
 
 Game.mixed = ->
   Game.reset()
-  roshan = Bodies.rectangle 0, _sceneHeight - 50, 200, 100,
+  roshan = Bodies.rectangle 100, _sceneHeight - 50, 200, 100,
     friction: 0.01
     restitution: 0.4
+  bottom = Bodies.rectangle 100, _sceneHeight, 200, 1,
+    isStatic: true
+
+  #direction = true
   _sceneEvents.push Events.on _engine, "tick", (event)->
     roshan.position.x = _sceneWidth / 2 + 100 * Math.sin(_engine.timing.timestamp * 0.001)
+    Body.translate bottom, x: roshan.position.x - bottom.position.x, y: 0
+
+
+#    if direction
+#      Body.translate roshan, x: 1, y: 0
+#      if roshan.position.x >= _sceneWidth - 100
+#        direction = false
+#    else
+#      Body.translate roshan, x: -1, y: 0
+#      if roshan.position.x <= 100
+#        direction = true
+
+
+    #
+    #roshan.setStatic true
     #Body.applyGravityAll([roshan], { x: 0, y: -1 })
 
   World.add _engine.world, roshan
+  World.add _engine.world, bottom
 
 
 Game.action = ->
-  World.add _engine.world, Bodies.rectangle _sceneWidth * 0.5, 0, 40, 40,
+  World.add _engine.world, Bodies.rectangle _sceneWidth * 0.5, 0, 61, 52,
     friction: 0.01
     restitution: 0.4
-    #render:
+    render:
+      sprite:
+        texture: './img/block/0.png'
 
 
 Game.updateScene = ->
@@ -118,18 +140,18 @@ Game.reset = ->
   Common._seed = 2
   World.clear _world
   Engine.clear _engine
-  offset = 5
-  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, -offset, _sceneWidth + 0.5, 50.5,
-    isStatic: true
-  )
-  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, _sceneHeight + offset, _sceneWidth + 0.5, 50.5,
-    isStatic: true
-  )
-  World.addBody _world, Bodies.rectangle(_sceneWidth + offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
-    isStatic: true
-  )
-  World.addBody _world, Bodies.rectangle(-offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
-    isStatic: true
-  )
+#  offset = 5
+#  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, -offset, _sceneWidth + 0.5, 50.5,
+#    isStatic: true
+#  )
+#  World.addBody _world, Bodies.rectangle(_sceneWidth * 0.5, _sceneHeight + offset, _sceneWidth + 0.5, 50.5,
+#    isStatic: true
+#  )
+#  World.addBody _world, Bodies.rectangle(_sceneWidth + offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
+#    isStatic: true
+#  )
+#  World.addBody _world, Bodies.rectangle(-offset, _sceneHeight * 0.5, 50.5, _sceneHeight + 0.5,
+#    isStatic: true
+#  )
 
 Game.init()
